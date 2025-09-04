@@ -1,0 +1,1 @@
+# TODO: find the best GCC flags for min executable size
