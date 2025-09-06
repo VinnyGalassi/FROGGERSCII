@@ -7,7 +7,12 @@ CC = gcc
 # -freestanding tells compiler there is no standard library
 # -fno-builtin prevents compiler from using built-in functions that may not be available
 
-CFLAGS = -O3 -Wall -s -Iinclude -nostartfiles
+# gcmasher recommended flags:
+# gcc -O -ffast-math -fomit-frame-pointer -fauto-inc-dec -mpush-args -mno-red-zone -mstackrealign -fno-inline -nostartfiles -o ../frogger ../src/frogger.c
+
+# CFLAGS = -O3 -Wall -s -Iinclude -nostartfiles
+CFLAGS = -O -Wall -s -Iinclude -ffast-math -fomit-frame-pointer -fauto-inc-dec -mpush-args -mno-red-zone -mstackrealign -fno-inline -nostartfiles
+
 SRC = src/frogger.c
 OUT = frogger
 

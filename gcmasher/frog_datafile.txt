@@ -18,9 +18,6 @@ results.txt
 -mno-red-zone
 -mstackrealign
 -fno-inline
--Wall
--s
--Iinclude
 *-nostartfiles
 # -fmove-all-movables
 # -fshort-double
