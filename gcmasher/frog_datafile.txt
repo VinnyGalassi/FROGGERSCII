@@ -1,0 +1,28 @@
+# Example datafile for GC Masher
+# Rows starting with roadkill are comments. Don't leave blank rows here.
+#
+# Result filename:
+results.txt
+# Measured output file:
+../frogger
+#
+# Finally the choices. Start the row with * if the choice is to be present
+# always. Multiple choices on one row means try switching between them and
+# a single choice means it's binary on/off. See below and you'll get it...
+*gcc
+-O -Os -O1 -O2 -O3
+-ffast-math
+-fomit-frame-pointer
+-fauto-inc-dec
+-mpush-args
+-mno-red-zone
+-mstackrealign
+-fno-inline
+-Wall
+-s
+-Iinclude
+*-nostartfiles
+# -fmove-all-movables
+# -fshort-double
+# -fforce-mem
+*-o ../frogger ../src/frogger.c
