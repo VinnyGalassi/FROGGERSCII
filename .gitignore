@@ -1,0 +1,7 @@
+.vscode/
+frogger
+gcmasher/Makefile
+gcmasher/main.c
+results.txt
+gcmasher/example_datafile.txt
+gcmasher/test.c
