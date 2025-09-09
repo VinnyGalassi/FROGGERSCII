@@ -1,4 +1,3 @@
-
 CC = gcc
 # TODO: find flags to minimize binary size
 # -nostartfiles -nodefaultlibs -nostdlib -ffreestanding -fno-builtin -fdata-sections -ffunction-sections -Wl,--gc-sections
@@ -11,16 +10,18 @@ CC = gcc
 # gcc -O -ffast-math -fomit-frame-pointer -fauto-inc-dec -mpush-args -mno-red-zone -mstackrealign -fno-inline -nostartfiles -o ../frogger ../src/frogger.c
 
 # CFLAGS = -O3 -Wall -s -Iinclude -nostartfiles
-CFLAGS = -O -Wall -s -Iinclude -ffast-math -fomit-frame-pointer -fauto-inc-dec -mpush-args -mno-red-zone -mstackrealign -fno-inline -nostartfiles
+# Build flags adjusted for multi-file project; keep it standard and portable.
+CFLAGS = -O2 -Wall -Wextra -s -Iinclude
+LDFLAGS =
 
-SRC = src/frogger.c
+SRC = src/frogger.c src/app.c src/renderer.c src/input.c src/lanes.c
 OUT = frogger
 
 # Always start with a clean build
 all: clean $(OUT) size
 
 $(OUT): $(SRC)
-	$(CC) $(CFLAGS) -o $(OUT) $(SRC)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $(OUT) $(SRC)
 # Strip binary
 	strip $(OUT)
 
@@ -33,3 +34,10 @@ size: $(OUT)
 
 clean:
 	rm -f $(OUT)
+
+# ---- Tiny, size-optimized build profile ----
+tiny: clean
+	$(CC) -Os -s -fdata-sections -ffunction-sections -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-plt -fmerge-constants -fno-ident -fomit-frame-pointer -fvisibility=hidden -Iinclude \
+		-Wl,--gc-sections -Wl,-s -o $(OUT) $(SRC)
+	strip $(OUT)
+	$(MAKE) size
