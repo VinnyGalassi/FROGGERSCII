@@ -1,16 +1,17 @@
-#include <stdio.h>
-#include <sys/select.h>
+#include <unistd.h>
 #include "app.h"
 #include "state.h"
 #include "renderer.h"
 #include "input.h"
 #include "lanes.h"
 
+// #include <time.h>
 static void sleep_ms(int ms) {
-    struct timeval tv;
-    tv.tv_sec  = ms / 1000;
-    tv.tv_usec = (ms % 1000) * 1000;
-    select(0, NULL, NULL, NULL, &tv);
+    if (ms > 0) usleep(ms * 1000);
+    // struct timespec ts;
+    // ts.tv_sec = ms / 1000;
+    // ts.tv_nsec = (ms % 1000) * 1000000;
+    // nanosleep(&ts, NULL);
 }
 
 static void reset_frog(GameState *gs) {
@@ -57,7 +58,8 @@ void app_run(void) {
     renderer_draw_start_screen();
 
     if (input_init_raw() != 0) {
-        puts("Failed to enter raw mode.");
+        const char *fail = "Failed to enter raw mode.\n";
+        write(1, fail, 25);
         return;
     }
 
