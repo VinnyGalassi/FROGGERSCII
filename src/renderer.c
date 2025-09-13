@@ -1,11 +1,12 @@
-#include <unistd.h>
+// #include <unistd.h>
 #include "renderer.h"
 #include "state.h"
 #include "lanes.h"
+#include "custom_unistd.h"
 
 static void clear_and_home(void) {
     const char *esc = "\x1b[2J\x1b[H";
-    for (const char *p = esc; *p; ++p) write(1, p, 1);
+    for (const char *p = esc; *p; ++p) my_write(1, p, 1);
 }
 
 static void draw_border_line(void) {
@@ -15,7 +16,7 @@ static void draw_border_line(void) {
     for (int x = 0; x < WIDTH; x++) buf[i++] = '-';
     buf[i++] = '+';
     buf[i++] = '\n';
-    write(1, buf, i);
+    my_write(1, buf, i);
 }
 
 static void draw_grid(const GameState *gs) {
@@ -37,7 +38,7 @@ static void draw_grid(const GameState *gs) {
         }
         line[i++] = '|';
         line[i++] = '\n';
-        write(1, line, i);
+        my_write(1, line, i);
     }
     draw_border_line();
 }
@@ -53,10 +54,10 @@ void renderer_draw_start_screen(void) {
         "  Press 'q' to quit\n"
         "\n"
         "  > ";
-    for (const char *p = msg; *p; ++p) write(1, p, 1);
+    for (const char *p = msg; *p; ++p) my_write(1, p, 1);
 }
 
-// Helper to write an integer to stdout
+// Helper to my_write an integer to stdout
 static void write_int(int n) {
     char buf[12];
     int i = 11;
@@ -68,20 +69,20 @@ static void write_int(int n) {
         u /= 10;
     } while (u);
     if (neg) buf[i--] = '-';
-    write(1, buf + i + 1, 11 - i);
+    my_write(1, buf + i + 1, 11 - i);
 }
 
 void renderer_draw_game(const GameState *gs) {
     clear_and_home();
     draw_grid(gs);
     const char *lives = "Lives: ";
-    write(1, lives, 7);
+    my_write(1, lives, 7);
     write_int(gs->frog.lives);
     const char *score = "   Score: ";
-    write(1, score, 10);
+    my_write(1, score, 10);
     write_int(gs->frog.score);
     const char *rest = "   (Arrows/WASD, q quits)\n";
-    write(1, rest, 27);
+    my_write(1, rest, 27);
 }
 
 void renderer_draw_game_over(const GameState *gs) {
@@ -90,10 +91,10 @@ void renderer_draw_game_over(const GameState *gs) {
         "+------------------+\n"
         "|     GAME OVER    |\n"
         "+------------------+\n";
-    for (const char *p = msg; *p; ++p) write(1, p, 1);
+    for (const char *p = msg; *p; ++p) my_write(1, p, 1);
     const char *fs = "Final Score: ";
-    write(1, fs, 13);
+    my_write(1, fs, 13);
     write_int(gs->frog.score);
     const char *end = "\n\nPress Enter to exit.\n";
-    write(1, end, 24);
+    my_write(1, end, 24);
 }

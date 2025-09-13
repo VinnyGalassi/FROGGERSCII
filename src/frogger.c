@@ -5,7 +5,8 @@
  */
 
 #include "app.h"
-#include <unistd.h>
+// #include <unistd.h>
+#include "custom_unistd.h"
 
 // _start denotes program entry point when using -nostartfiles
 // avoids overhead of normal OS main() setup
@@ -50,5 +51,6 @@ int _start(void) {
     // }
 
     // Use _exit to avoid process cleanup code (exit()) that may not be available and go straight to OS's shutdown routine
-    _exit(0);
+    // _exit(0);
+    my_exit(0);
 }

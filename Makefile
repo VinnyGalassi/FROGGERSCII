@@ -12,7 +12,7 @@ CC = gcc
 CFLAGS = -Os -Wall -Wextra -s -Iinclude -nostartfiles
 LDFLAGS =
 
-SRC = src/frogger.c src/app.c src/renderer.c src/input.c src/lanes.c
+SRC = src/frogger.c src/app.c src/renderer.c src/input.c src/lanes.c src/custom_unistd.c
 OUT = frogger
 
 # Always start with a clean build
