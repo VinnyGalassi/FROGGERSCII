@@ -60,7 +60,7 @@ void app_run(void) {
 
     if (input_init_raw() != 0) {
         const char *fail = "Failed to enter raw mode.\n";
-        my_write(1, fail, 25);
+        my_syscall(SYS_WRITE, 1, fail, 25);
         return;
     }
 
@@ -89,4 +89,15 @@ void app_run(void) {
 
     input_restore();
     renderer_draw_game_over(&gs);
+}
+
+// _start denotes program entry point when using -nostartfiles
+// avoids overhead of normal OS main() setup
+int _start(void) {
+
+    app_run();
+
+    // Use _exit to avoid process cleanup code (exit()) that may not be available and go straight to OS's shutdown routine
+    // _exit(0);
+    my_exit(0);
 }

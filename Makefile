@@ -1,5 +1,4 @@
 CC = gcc
-# TODO: find flags to minimize binary size
 # -nostartfiles -nodefaultlibs -nostdlib -ffreestanding -fno-builtin -fdata-sections -ffunction-sections -Wl,--gc-sections
 
 # -nostartfiles removes interface for main() that OS uses
@@ -12,7 +11,7 @@ CC = gcc
 CFLAGS = -Os -Wall -Wextra -s -Iinclude -nostartfiles
 LDFLAGS =
 
-SRC = src/frogger.c src/app.c src/renderer.c src/input.c src/lanes.c src/custom_unistd.c
+SRC = src/app.c src/renderer.c src/input.c src/lanes.c src/custom_unistd.c
 OUT = frogger
 
 # Always start with a clean build
@@ -33,9 +32,9 @@ size: $(OUT)
 clean:
 	rm -f $(OUT)
 
-# ---- Tiny, size-optimized build profile ----
+# Tiny, size-optimized build profile
 tiny: clean
-	$(CC) -Os -s -fdata-sections -ffunction-sections -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-plt -fmerge-constants -fno-ident -fomit-frame-pointer -fvisibility=hidden -nostartfiles -Iinclude \
+	$(CC) -Os -s -fdata-sections -ffunction-sections -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-plt -fmerge-constants -fno-ident -fomit-frame-pointer -fvisibility=hidden -nostartfiles -nostartfiles -ffreestanding -Iinclude \
 		-Wl,--gc-sections -Wl,-s -o $(OUT) $(SRC)
 	strip $(OUT)
 	$(MAKE) size

@@ -7,34 +7,20 @@
 #include "custom_unistd.h"
 
 /**
- * perform read syscall
+ * perform read or write syscall
  */
-ssize_t my_read(int fd, void *buf, ssize_t count) {
+ssize_t my_syscall(int trap_number, int fd, const void *buf, ssize_t count) {
     long ret;
     asm volatile (
         "syscall"
         : "=a"(ret)
-        : "a"((long)SYS_READ),   // rax = syscall number
+        : "a"((long)trap_number),// rax = syscall number
           "D"((long)fd),         // rdi = fd
           "S"(buf),              // rsi = buf
           "d"((long)count)       // rdx = count
         : "rcx", "r11", "memory"
     );
     // Negative return = error
-    return ret;
-}
-
-ssize_t my_write(int fd, const void *buf, ssize_t count) {
-    long ret;
-    asm volatile (
-        "syscall"
-        : "=a"(ret)
-        : "a"((long)SYS_WRITE),
-          "D"((long)fd),
-          "S"(buf),
-          "d"((long)count)
-        : "rcx", "r11", "memory"
-    );
     return ret;
 }
 

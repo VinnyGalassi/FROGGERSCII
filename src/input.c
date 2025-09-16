@@ -37,7 +37,7 @@ static Key map_char(unsigned char c) {
 
 Key input_read_key(void) {
     unsigned char buf[8];
-    int n = (int)my_read(STDIN_FILENO, buf, sizeof(buf));
+    int n = (int)my_syscall(SYS_READ, STDIN_FILENO, buf, sizeof(buf));
     if (n <= 0) return KEY_NONE;
 
     if (buf[0] == 0x1b && n >= 3 && buf[1] == '[') {

@@ -17,8 +17,7 @@ typedef long ssize_t;
 #define	STDOUT_FILENO	1	/* Standard output.  */
 #define	STDERR_FILENO	2	/* Standard error output.  */
 
-ssize_t my_read(int fd, void *buf, ssize_t count);
-ssize_t my_write(int fd, const void *buf, ssize_t count);
+ssize_t my_syscall(int trap_number, int fd, const void *buf, ssize_t count);
 void my_exit(int status);
 
 #endif // CUSTOM_UNISTD_H
