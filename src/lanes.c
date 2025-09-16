@@ -29,6 +29,14 @@ void lanes_init(GameState *gs) {
 }
 
 void lanes_step(GameState *gs) {
+    float scale = 1.0f;
+    switch (gs->difficulty) {
+        case DIFF_EASY:   scale = 1.6f; break;  // noticeably slower
+        case DIFF_MEDIUM: scale = 1.2f; break;  // baseline
+        case DIFF_HARD:   scale = 0.f; break;  // noticeably faster
+        default:          scale = 1.0f; break;
+    }
+
     for (int i = 0; i < gs->lane_count; i++) {
         Lane *L = &gs->lanes[i];
         if (++L->tick >= L->speed) {
