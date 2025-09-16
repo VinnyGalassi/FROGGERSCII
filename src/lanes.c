@@ -33,7 +33,7 @@ void lanes_step(GameState *gs) {
     switch (gs->difficulty) {
         case DIFF_EASY:   scale = 1.6f; break;  // noticeably slower
         case DIFF_MEDIUM: scale = 1.2f; break;  // baseline
-        case DIFF_HARD:   scale = 0.f; break;  // noticeably faster
+        case DIFF_HARD:   scale = 0.8f; break;  // noticeably faster
         default:          scale = 1.0f; break;
     }
 
