@@ -4,7 +4,7 @@
 # Result filename:
 results.txt
 # Measured output file:
-../frogger
+frogger
 #
 # Finally the choices. Start the row with * if the choice is to be present
 # always. Multiple choices on one row means try switching between them and
@@ -18,8 +18,11 @@ results.txt
 -mno-red-zone
 -mstackrealign
 -fno-inline
+-ffreestanding
+-fno-plt
 *-nostartfiles
+*-Iinclude
 # -fmove-all-movables
 # -fshort-double
 # -fforce-mem
-*-o ../frogger ../src/frogger.c
+*-o frogger src/app.c src/renderer.c src/input.c src/lanes.c src/custom_unistd.c

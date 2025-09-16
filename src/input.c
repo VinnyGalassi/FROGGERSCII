@@ -1,7 +1,8 @@
-#include <unistd.h>
+// #include <unistd.h>
 #include <termios.h>
 #include <fcntl.h>
 #include "input.h"
+#include "custom_unistd.h"
 
 static struct termios orig;
 static int raw_enabled = 0;
@@ -36,7 +37,7 @@ static Key map_char(unsigned char c) {
 
 Key input_read_key(void) {
     unsigned char buf[8];
-    int n = (int)read(STDIN_FILENO, buf, sizeof(buf));
+    int n = (int)my_syscall(SYS_READ, STDIN_FILENO, buf, sizeof(buf));
     if (n <= 0) return KEY_NONE;
     unsigned char drain_buf[8];
     while ((read(STDIN_FILENO, drain_buf, sizeof(drain_buf))) > 0) {}

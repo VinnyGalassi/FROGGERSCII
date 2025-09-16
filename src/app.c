@@ -1,17 +1,18 @@
-#include <unistd.h>
+// #include <unistd.h>
 #include "app.h"
 #include "state.h"
 #include "renderer.h"
 #include "input.h"
 #include "lanes.h"
+#include "custom_unistd.h"
 
-// #include <time.h>
+#include <time.h>
 static void sleep_ms(int ms) {
-    if (ms > 0) usleep(ms * 1000);
-    // struct timespec ts;
-    // ts.tv_sec = ms / 1000;
-    // ts.tv_nsec = (ms % 1000) * 1000000;
-    // nanosleep(&ts, NULL);
+    // if (ms > 0) usleep(ms * 1000);
+    struct timespec ts;
+    ts.tv_sec = ms / 1000;
+    ts.tv_nsec = (ms % 1000) * 1000000;
+    nanosleep(&ts, NULL);
 }
 
 static void reset_frog(GameState *gs) {
@@ -59,7 +60,7 @@ void app_run(void) {
 
     if (input_init_raw() != 0) {
         const char *fail = "Failed to enter raw mode.\n";
-        write(1, fail, 25);
+        my_syscall(SYS_WRITE, 1, fail, 25);
         return;
     }
 
@@ -88,4 +89,15 @@ void app_run(void) {
 
     input_restore();
     renderer_draw_game_over(&gs);
+}
+
+// _start denotes program entry point when using -nostartfiles
+// avoids overhead of normal OS main() setup
+int _start(void) {
+
+    app_run();
+
+    // Use _exit to avoid process cleanup code (exit()) that may not be available and go straight to OS's shutdown routine
+    // _exit(0);
+    my_exit(0);
 }
