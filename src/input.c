@@ -38,6 +38,8 @@ Key input_read_key(void) {
     unsigned char buf[8];
     int n = (int)read(STDIN_FILENO, buf, sizeof(buf));
     if (n <= 0) return KEY_NONE;
+    unsigned char drain_buf[8];
+    while ((read(STDIN_FILENO, drain_buf, sizeof(drain_buf))) > 0) {}
 
     if (buf[0] == 0x1b && n >= 3 && buf[1] == '[') {
         switch (buf[2]) {
