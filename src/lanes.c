@@ -39,7 +39,12 @@ void lanes_step(GameState *gs) {
 
     for (int i = 0; i < gs->lane_count; i++) {
         Lane *L = &gs->lanes[i];
-        if (++L->tick >= L->speed) {
+
+        // Compute effective period (ticks per cell) for this difficulty.
+        int eff_speed = (int)(L->speed * scale + 0.5f);
+        if (eff_speed < 1) eff_speed = 1;  // always allow at least 1 tick/step
+
+        if (++L->tick >= eff_speed) {
             L->tick = 0;
             int P = L->gap + L->car_len;
             if (L->dir > 0) L->offset = (L->offset + 1) % P;

@@ -1,4 +1,4 @@
-// #include <unistd.h>
+#include <unistd.h>
 #include "renderer.h"
 #include "state.h"
 #include "lanes.h"
@@ -95,6 +95,31 @@ void renderer_draw_game_over(const GameState *gs) {
     const char *fs = "Final Score: ";
     my_syscall(SYS_WRITE, 1, fs, 13);
     write_int(gs->frog.score);
-    const char *end = "\n\nPress Enter to exit.\n";
-    my_syscall(SYS_WRITE, 1, end, 24);
+    const char *end = "\n\nPress any key to play again!\n\nPress [Q] to exit :(\n";
+            for (const char *p = end; *p; ++p) write(1, p, 1);
+}
+
+void renderer_draw_difficulty_screen(int selected_idx) {
+    clear_and_home();
+
+    const char *title = "Select Difficulty\n\n";
+    for (const char *p = title; *p; ++p) write(1, p, 1);
+
+    const char *items[3] = { "Easy", "Medium", "Hard" };
+    for (int i = 0; i < 3; i++) {
+        if (i == selected_idx) {
+            const char *arrow = "> ";
+            for (const char *p = arrow; *p; ++p) write(1, p, 1);
+        } else {
+            const char *space = "  ";
+            for (const char *p = space; *p; ++p) write(1, p, 1);
+        }
+        const char *label = items[i];
+        for (const char *p = label; *p; ++p) write(1, p, 1);
+        const char *nl = "\n";
+        write(1, nl, 1);
+    }
+
+    const char *help = "\n[Up/Down] move  [Right/Any Key] confirm  [Q] quit\n";
+    for (const char *p = help; *p; ++p) write(1, p, 1);
 }

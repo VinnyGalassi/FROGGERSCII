@@ -24,11 +24,22 @@ typedef struct {
     int score;
 } Frog;
 
+typedef enum {
+    DIFF_EASY,
+    DIFF_MEDIUM,
+    DIFF_HARD
+} Difficulty;
+
 typedef struct {
     Frog frog;
     Lane lanes[MAX_LANES];
     int lane_count;
     int running;
+    Difficulty difficulty;
 } GameState;
+
+void game_init(GameState *gs, Difficulty diff);
+void on_goal(GameState *gs);
+void on_hit(GameState *gs);
 
 #endif

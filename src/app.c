@@ -8,7 +8,6 @@
 
 #include <time.h>
 static void sleep_ms(int ms) {
-    // if (ms > 0) usleep(ms * 1000);
     struct timespec ts;
     ts.tv_sec = ms / 1000;
     ts.tv_nsec = (ms % 1000) * 1000000;
@@ -20,19 +19,20 @@ static void reset_frog(GameState *gs) {
     gs->frog.y = HEIGHT - 2;
 }
 
-static void game_init(GameState *gs) {
-    gs->running   = 1;
-    gs->frog.lives = LIVES_START;
-    gs->frog.score = 0;
+void game_init(GameState *gs, Difficulty diff) {
+    gs->running     = 1;
+    gs->frog.lives  = LIVES_START;
+    gs->frog.score  = 0;
+    gs->difficulty  = diff;
     reset_frog(gs);
     lanes_init(gs);
 }
 
 static void handle_key(GameState *gs, Key k) {
     int nx = gs->frog.x, ny = gs->frog.y;
-    if (k == KEY_UP)    ny--;
-    else if (k == KEY_DOWN) ny++;
-    else if (k == KEY_LEFT) nx--;
+    if (k == KEY_UP)         ny--;
+    else if (k == KEY_DOWN)  ny++;
+    else if (k == KEY_LEFT)  nx--;
     else if (k == KEY_RIGHT) nx++;
     else if (k == KEY_QUIT)  { gs->running = 0; return; }
 
@@ -41,21 +41,62 @@ static void handle_key(GameState *gs, Key k) {
     }
 }
 
-static void on_hit(GameState *gs) {
+void on_hit(GameState *gs) {
     if (gs->frog.lives > 0) gs->frog.lives--;
     reset_frog(gs);
     if (gs->frog.lives == 0) gs->running = 0;
 }
 
-static void on_goal(GameState *gs) {
+void on_goal(GameState *gs) {
     gs->frog.score += 100;
     reset_frog(gs);
 }
 
-void app_run(void) {
-    GameState gs;
-    game_init(&gs);
+// Per-difficulty tick (ms)
+static int tick_for(Difficulty d) {
+    switch (d) {
+        case DIFF_EASY:   return 150;
+        case DIFF_MEDIUM: return 90;
+        case DIFF_HARD:   return 45;
+        default:          return 90;
+    }
+}
 
+// Difficulty screen: Up/Down to move; Right (or any non-Up/Down/‘q’) confirms; 'q' quits to exit path.
+static Difficulty select_difficulty(void) {
+    int selected = 1; // default to Medium
+    renderer_draw_difficulty_screen(selected);
+
+    for (;;) {
+        Key k = input_read_key();
+        if (k == KEY_NONE) { sleep_ms(10); continue; }
+
+        if (k == KEY_UP) {
+            selected = (selected + 3 - 1) % 3;
+            renderer_draw_difficulty_screen(selected);
+        } else if (k == KEY_DOWN) {
+            selected = (selected + 1) % 3;
+            renderer_draw_difficulty_screen(selected);
+        } else if (k == KEY_RIGHT) {
+            return (Difficulty)selected;
+        } else if (k == KEY_QUIT) {
+            // You can handle “quit at difficulty” however you like; here we just default to Medium.
+            return DIFF_MEDIUM;
+        } else {
+            // Any other key confirms
+            return (Difficulty)selected;
+        }
+    }
+}
+
+static void print_goodbye(void) {
+    const char *final = "Thanks for playing! Goodbye :)\n";
+    for (const char *p = final; *p; ++p) {
+        my_syscall(SYS_WRITE, 1, p, 1);
+    }
+}
+
+void app_run(void) {
     renderer_draw_start_screen();
 
     if (input_init_raw() != 0) {
@@ -64,6 +105,7 @@ void app_run(void) {
         return;
     }
 
+    // Wait for any key to leave the start screen (or 'q' to quit)
     for (;;) {
         Key k = input_read_key();
         if (k == KEY_QUIT) { input_restore(); return; }
@@ -71,33 +113,53 @@ void app_run(void) {
         sleep_ms(10);
     }
 
-    while (gs.running) {
-        Key k = input_read_key();
-        if (k != KEY_NONE) handle_key(&gs, k);
+    // Main loop: select difficulty -> run game -> game over -> play again?
+    for (;;) {
+        // 1) Difficulty selection
+        Difficulty diff = select_difficulty();
 
-        lanes_step(&gs);
+        // 2) Initialize a fresh game with the chosen difficulty
+        GameState gs;
+        game_init(&gs, diff);
 
-        if (gs.frog.y == 0) {
-            on_goal(&gs);
-        } else if (gs.frog.y != HEIGHT - 1 && lanes_car_at(&gs, gs.frog.x, gs.frog.y)) {
-            on_hit(&gs);
+        const int tick_ms = tick_for(gs.difficulty);
+
+        // 3) Run the game loop
+        while (gs.running) {
+            Key k = input_read_key();
+            if (k != KEY_NONE) handle_key(&gs, k);
+
+            lanes_step(&gs);
+
+            if (gs.frog.y == 0) {
+                on_goal(&gs);
+            } else if (gs.frog.y != HEIGHT - 1 &&
+                       lanes_car_at(&gs, gs.frog.x, gs.frog.y)) {
+                on_hit(&gs);
+            }
+
+            renderer_draw_game(&gs);
+            sleep_ms(tick_ms);
         }
 
-        renderer_draw_game(&gs);
-        sleep_ms(TICK_MS);
+        // 4) Game over and replay prompt
+        renderer_draw_game_over(&gs);
+        for (;;) {
+            Key k = input_read_key();
+            if (k == KEY_NONE) { sleep_ms(10); continue; }
+            if (k == KEY_QUIT) { input_restore(); print_goodbye(); return; } // 'q' exits entirely
+            break; // any other key -> play again (back to difficulty selection)
+        }
     }
-
-    input_restore();
-    renderer_draw_game_over(&gs);
+    const char *final = "Thanks for playing! Goodbye :)\n";
+    for (const char *p = final; *p; ++p) {
+        my_syscall(SYS_WRITE, 1, p, 1);
+}
 }
 
 // _start denotes program entry point when using -nostartfiles
-// avoids overhead of normal OS main() setup
 int _start(void) {
-
     app_run();
-
-    // Use _exit to avoid process cleanup code (exit()) that may not be available and go straight to OS's shutdown routine
-    // _exit(0);
     my_exit(0);
+    return 0;
 }
