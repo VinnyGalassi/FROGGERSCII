@@ -1,4 +1,3 @@
-#include <unistd.h>
 #include "renderer.h"
 #include "state.h"
 #include "lanes.h"
@@ -6,7 +5,7 @@
 
 static void clear_and_home(void) {
     const char *esc = "\x1b[2J\x1b[H";
-    for (const char *p = esc; *p; ++p) my_syscall(SYS_WRITE, 1, p, 1);
+    my_syscall(SYS_WRITE, 1, esc, 7);
 }
 
 static void draw_border_line(void) {
@@ -54,7 +53,7 @@ void renderer_draw_start_screen(void) {
         "  Press 'q' to quit\n"
         "\n"
         "  > ";
-    for (const char *p = msg; *p; ++p) my_syscall(SYS_WRITE, 1, p, 1);
+    my_syscall(SYS_WRITE, 1, msg, 186);
 }
 
 // Helper to my_syscall SYS_WRITE, an integer to stdout
@@ -91,35 +90,33 @@ void renderer_draw_game_over(const GameState *gs) {
         "+------------------+\n"
         "|     GAME OVER    |\n"
         "+------------------+\n";
-    for (const char *p = msg; *p; ++p) my_syscall(SYS_WRITE, 1, p, 1);
+    my_syscall(SYS_WRITE, 1, msg, 63);
     const char *fs = "Final Score: ";
     my_syscall(SYS_WRITE, 1, fs, 13);
     write_int(gs->frog.score);
     const char *end = "\n\nPress any key to play again!\n\nPress [Q] to exit :(\n";
-            for (const char *p = end; *p; ++p) write(1, p, 1);
+    my_syscall(SYS_WRITE, 1, end, 54);
 }
 
 void renderer_draw_difficulty_screen(int selected_idx) {
     clear_and_home();
 
     const char *title = "Select Difficulty\n\n";
-    for (const char *p = title; *p; ++p) write(1, p, 1);
+    my_syscall(SYS_WRITE, 1, title, 18);
 
-    const char *items[3] = { "Easy", "Medium", "Hard" };
+    const char *items[3] = { "Easy  \n", "Medium\n", "Hard  \n" };
     for (int i = 0; i < 3; i++) {
         if (i == selected_idx) {
             const char *arrow = "> ";
-            for (const char *p = arrow; *p; ++p) write(1, p, 1);
+            my_syscall(SYS_WRITE, 1, arrow, 2);
         } else {
             const char *space = "  ";
-            for (const char *p = space; *p; ++p) write(1, p, 1);
+            my_syscall(SYS_WRITE, 1, space, 2);
         }
         const char *label = items[i];
-        for (const char *p = label; *p; ++p) write(1, p, 1);
-        const char *nl = "\n";
-        write(1, nl, 1);
+        my_syscall(SYS_WRITE, 1, label, 7);
     }
 
     const char *help = "\n[Up/Down] move  [Right/Any Key] confirm  [Q] quit\n";
-    for (const char *p = help; *p; ++p) write(1, p, 1);
+    my_syscall(SYS_WRITE, 1, help, 51);
 }

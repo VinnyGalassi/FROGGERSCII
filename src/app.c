@@ -91,9 +91,7 @@ static Difficulty select_difficulty(void) {
 
 static void print_goodbye(void) {
     const char *final = "Thanks for playing! Goodbye :)\n";
-    for (const char *p = final; *p; ++p) {
-        my_syscall(SYS_WRITE, 1, p, 1);
-    }
+    my_syscall(SYS_WRITE, 1, final, 31);
 }
 
 void app_run(void) {
@@ -151,10 +149,7 @@ void app_run(void) {
             break; // any other key -> play again (back to difficulty selection)
         }
     }
-    const char *final = "Thanks for playing! Goodbye :)\n";
-    for (const char *p = final; *p; ++p) {
-        my_syscall(SYS_WRITE, 1, p, 1);
-}
+    print_goodbye();
 }
 
 // _start denotes program entry point when using -nostartfiles
