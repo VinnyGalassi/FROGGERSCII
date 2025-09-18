@@ -1,6 +1,6 @@
 # FROGGERSCII
 
-Miniaturized version of the classic Frogger game that runs in the terminal with ASCII art. Only necissary mechanics are included, and stdio, stdlib, and unistd were removed by writing assembly syscalls. The end result is a game that is only ??? bytes.
+Miniaturized version of the classic Frogger game that runs in the terminal with ASCII art. Only necissary mechanics are included, and stdio, stdlib, and unistd were removed by writing assembly syscalls. The end result is a game that is only 9536 bytes, making it easy to store on old computers and send across low-bitrate communication channels.
 
 ***
 
