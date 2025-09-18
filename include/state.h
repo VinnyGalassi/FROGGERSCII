@@ -27,7 +27,8 @@ typedef struct {
 typedef enum {
     DIFF_EASY,
     DIFF_MEDIUM,
-    DIFF_HARD
+    DIFF_HARD,
+    QUIT
 } Difficulty;
 
 typedef struct {

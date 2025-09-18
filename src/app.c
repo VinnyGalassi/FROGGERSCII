@@ -80,8 +80,7 @@ static Difficulty select_difficulty(void) {
         } else if (k == KEY_RIGHT) {
             return (Difficulty)selected;
         } else if (k == KEY_QUIT) {
-            // You can handle “quit at difficulty” however you like; here we just default to Medium.
-            return DIFF_MEDIUM;
+            return QUIT;
         } else {
             // Any other key confirms
             return (Difficulty)selected;
@@ -89,9 +88,10 @@ static Difficulty select_difficulty(void) {
     }
 }
 
-static void print_goodbye(void) {
+static void quit_terminal(void) {
     const char *final = "Thanks for playing! Goodbye :)\n";
     my_syscall(SYS_WRITE, 1, final, 31);
+    input_restore();
 }
 
 void app_run(void) {
@@ -106,7 +106,7 @@ void app_run(void) {
     // Wait for any key to leave the start screen (or 'q' to quit)
     for (;;) {
         Key k = input_read_key();
-        if (k == KEY_QUIT) { input_restore(); return; }
+        if (k == KEY_QUIT) { quit_terminal(); return; }
         if (k != KEY_NONE) break;
         sleep_ms(10);
     }
@@ -115,6 +115,7 @@ void app_run(void) {
     for (;;) {
         // 1) Difficulty selection
         Difficulty diff = select_difficulty();
+        if (diff == QUIT) { quit_terminal(); return; }
 
         // 2) Initialize a fresh game with the chosen difficulty
         GameState gs;
@@ -131,8 +132,7 @@ void app_run(void) {
 
             if (gs.frog.y == 0) {
                 on_goal(&gs);
-            } else if (gs.frog.y != HEIGHT - 1 &&
-                       lanes_car_at(&gs, gs.frog.x, gs.frog.y)) {
+            } else if (gs.frog.y != HEIGHT - 1 && lanes_car_at(&gs, gs.frog.x, gs.frog.y)) {
                 on_hit(&gs);
             }
 
@@ -145,11 +145,11 @@ void app_run(void) {
         for (;;) {
             Key k = input_read_key();
             if (k == KEY_NONE) { sleep_ms(10); continue; }
-            if (k == KEY_QUIT) { input_restore(); print_goodbye(); return; } // 'q' exits entirely
+            if (k == KEY_QUIT) { quit_terminal(); return; } // 'q' exits entirely
             break; // any other key -> play again (back to difficulty selection)
         }
     }
-    print_goodbye();
+    quit_terminal();
 }
 
 // _start denotes program entry point when using -nostartfiles

@@ -45,15 +45,15 @@ static void draw_grid(const GameState *gs) {
 void renderer_draw_start_screen(void) {
     clear_and_home();
     const char *msg =
-        "+------------------------------------------+\n"
+        "\n+------------------------------------------+\n"
         "|               ASCII FROGGER              |\n"
         "+------------------------------------------+\n"
         "\n"
-        "  Press any key to start\n"
+        "  Press arrow keys to start\n"
         "  Press 'q' to quit\n"
         "\n"
         "  > ";
-    my_syscall(SYS_WRITE, 1, msg, 186);
+    my_syscall(SYS_WRITE, 1, msg, 190);
 }
 
 // Helper to my_syscall SYS_WRITE, an integer to stdout
@@ -87,22 +87,22 @@ void renderer_draw_game(const GameState *gs) {
 void renderer_draw_game_over(const GameState *gs) {
     clear_and_home();
     const char *msg =
-        "+------------------+\n"
+        "\n+------------------+\n"
         "|     GAME OVER    |\n"
         "+------------------+\n";
-    my_syscall(SYS_WRITE, 1, msg, 63);
+    my_syscall(SYS_WRITE, 1, msg, 64);
     const char *fs = "Final Score: ";
     my_syscall(SYS_WRITE, 1, fs, 13);
     write_int(gs->frog.score);
-    const char *end = "\n\nPress any key to play again!\n\nPress [Q] to exit :(\n";
-    my_syscall(SYS_WRITE, 1, end, 54);
+    const char *end = "\n\nPress arrow keys to play again!\n\nPress [Q] to exit :(\n";
+    my_syscall(SYS_WRITE, 1, end, 57);
 }
 
 void renderer_draw_difficulty_screen(int selected_idx) {
     clear_and_home();
 
-    const char *title = "Select Difficulty\n\n";
-    my_syscall(SYS_WRITE, 1, title, 18);
+    const char *title = "\nSelect Difficulty\n\n";
+    my_syscall(SYS_WRITE, 1, title, 19);
 
     const char *items[3] = { "Easy  \n", "Medium\n", "Hard  \n" };
     for (int i = 0; i < 3; i++) {
@@ -117,6 +117,6 @@ void renderer_draw_difficulty_screen(int selected_idx) {
         my_syscall(SYS_WRITE, 1, label, 7);
     }
 
-    const char *help = "\n[Up/Down] move  [Right/Any Key] confirm  [Q] quit\n";
-    my_syscall(SYS_WRITE, 1, help, 51);
+    const char *help = "\n[Up/Down] move  [Right/Left] confirm  [Q] quit\n";
+    my_syscall(SYS_WRITE, 1, help, 48);
 }
