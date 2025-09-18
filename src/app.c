@@ -142,6 +142,12 @@ void app_run(void) {
 
         // 4) Game over and replay prompt
         renderer_draw_game_over(&gs);
+        // For 2 seconds, clear any buffered input and just wait
+        for (int a = 0; a < 20; a++) {
+            unsigned char drain_buf[8];
+            while ((my_syscall(SYS_READ, STDIN_FILENO, drain_buf, sizeof(drain_buf))) > 0) {}
+            sleep_ms(100);
+        }
         for (;;) {
             Key k = input_read_key();
             if (k == KEY_NONE) { sleep_ms(10); continue; }
