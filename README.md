@@ -4,6 +4,7 @@ Miniaturized version of the classic Frogger game that runs in the terminal with 
 
 ***
 
+```
 
                      %%====%                %%%%%
                    %=========%           %=========
@@ -46,4 +47,4 @@ Miniaturized version of the classic Frogger game that runs in the terminal with 
                         %% %==% %=   ==%%==% %%
                             %=%          =%
 
-
+```
